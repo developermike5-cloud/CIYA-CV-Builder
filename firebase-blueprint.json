@@ -1,0 +1,39 @@
+{
+  "entities": {
+    "DownloadStats": {
+      "title": "Download Stats",
+      "description": "Multi-category counters for platform downloads",
+      "type": "object",
+      "properties": {
+        "total_cv": {
+          "type": "number",
+          "description": "Total CV downloads"
+        },
+        "total_letter": {
+          "type": "number",
+          "description": "Total Letter Builder downloads"
+        },
+        "industries": {
+          "type": "object",
+          "description": "Breakdown of CV downloads by industry"
+        },
+        "letterCategories": {
+          "type": "object",
+          "description": "Breakdown of Letter downloads by intent category"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Last increment time"
+        }
+      },
+      "required": ["updatedAt"]
+    }
+  },
+  "firestore": {
+    "/stats/downloads": {
+      "schema": "DownloadStats",
+      "description": "The global document used to track total downloads"
+    }
+  }
+}

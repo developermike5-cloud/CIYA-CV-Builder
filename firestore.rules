@@ -1,0 +1,49 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: stats
+    // Document ID: downloads
+    // Fields:
+    //   - count: number (required) - Total downloads
+    //   - updatedAt: timestamp (required) - Last update time
+    //
+    // ===============================================================
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && 
+             request.auth.token.email == "ogunnaikemichael2017@gmail.com" && 
+             request.auth.token.email_verified == true;
+    }
+
+    function isValidStat(data) {
+      return data.updatedAt is timestamp;
+    }
+
+    match /stats/downloads {
+      // Allow anyone (even unauthenticated) to read basic stats for display
+      allow read: if true;
+      
+      // Allow creation if it includes at least a timestamp
+      allow create: if isValidStat(request.resource.data);
+      
+      // Allow update for incrementing various stats counters
+      // We rely on the app logic to use increment() correctly
+      allow update: if isValidStat(request.resource.data) &&
+                      request.resource.data.updatedAt == request.time;
+    }
+
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
